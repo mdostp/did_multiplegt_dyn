@@ -579,14 +579,14 @@ suppressWarnings({
     ## Computing the Den_d matrices and their inverts,
     ## and creating locals storing the status quos for which Den_d^{-1} not defined. 
 
-    store_singular_XX <- ""
+ #   store_singular_XX <- ""
     store_noresidualization_XX <- c()
     levels_d_sq_XX_final <- c()
     levels_d_sq_XX <- levels(as.factor(df$d_sq_int_XX))
 
     for (l in levels_d_sq_XX) {
         data_XX <- df
-        assign(paste0("store_singular_", l, "_XX"), 0)
+    #    assign(paste0("store_singular_", l, "_XX"), 0)
         assign(paste0("useful_res_", l, "_XX"), 
             length(levels(as.factor(data_XX$F_g_XX[data_XX$d_sq_int_XX == l]))))
 
@@ -612,7 +612,7 @@ suppressWarnings({
           # Check if the corresponding matrix exists
           e_vec <- matrix(1, nrow = 1, ncol = count_controls + 2)
           if (is.na(e_vec %*% overall_XX %*% t(e_vec))) {
-              assign(paste0("store_singular_", l, "_XX"), 1)
+            #  assign(paste0("store_singular_", l, "_XX"), 1)
               store_noresidualization_XX <- c(store_noresidualization_XX, l)
               assign(paste0("useful_res_", l, "_XX"), 1)
           }
@@ -628,9 +628,9 @@ suppressWarnings({
             # Computing the matrix Denom^{-1}
             # Check if the matrix is invertible
             det_XX <- det(as.matrix(didmgt_XX))
-            if (abs(det_XX) <= 10^(-16)) {
-              assign(paste0("store_singular_", l, "_XX"), 1)
-            } 
+            # if (abs(det_XX) <= 10^(-16)) {
+            #   assign(paste0("store_singular_", l, "_XX"), 1)
+            # } 
 
             assign(paste0("inv_Denom_",l,"_XX"), Ginv(as.matrix(didmgt_XX), tol = 10^(-16)) * G_XX)
             }
@@ -639,23 +639,23 @@ suppressWarnings({
         }
 
     # Fill up store_singular_XX, with correct values of statu quo and not the levels
-    levels_d_sq_bis_XX <- levels(as.factor(df$d_sq_XX))
-    index_sing_XX <- 0 
-    for (l in levels_d_sq_bis_XX) {
-      index_sing_XX <- index_sing_XX + 1
-      if(get(paste0("store_singular_", index_sing_XX,"_XX")) == 1) {
-        store_singular_XX <- paste(store_singular_XX, l)
-      }
-    }
+    # levels_d_sq_bis_XX <- levels(as.factor(df$d_sq_XX))
+    # index_sing_XX <- 0 
+    # for (l in levels_d_sq_bis_XX) {
+    #   index_sing_XX <- index_sing_XX + 1
+    #   if(get(paste0("store_singular_", index_sing_XX,"_XX")) == 1) {
+    #     store_singular_XX <- paste(store_singular_XX, l)
+    #   }
+    # }
 
     # Display errors if one of the Den_d^{-1} is not defined
-    if (store_singular_XX != "") {
-      message(sprintf("Some control variables are not taken into account for groups with baseline treatment equal to: %s. This may occur in the following situations:", store_singular_XX))
-      message("1. For groups with those values of the baseline treatment, the regression of the outcome first difference on the controls' first differences and time fixed effects has fewer observations than variables. Note that for each value of the baseline treatment, those regressions are estimated among (g,t)s such that g has not changed treatment yet at t.")
-      message("2. For groups with those values of the baseline treatment, two or more of your control variables are perfectly collinear in the sample where the regression is run, for instance because those control variables do not vary over time.")
-    }
-
-    # Values of baseline treatment such that residualization could not be performed at all are dropped.
+    # if (store_singular_XX != "") {
+    #   message(sprintf("Some control variables are not taken into account for groups with baseline treatment equal to: %s. This may occur in the following situations:", store_singular_XX))
+    #   message("1. For groups with those values of the baseline treatment, the regression of the outcome first difference on the controls' first differences and time fixed effects has fewer observations than variables. Note that for each value of the baseline treatment, those regressions are estimated among (g,t)s such that g has not changed treatment yet at t.")
+    #   message("2. For groups with those values of the baseline treatment, two or more of your control variables are perfectly collinear in the sample where the regression is run, for instance because those control variables do not vary over time.")
+    # }
+    # 
+    # # Values of baseline treatment such that residualization could not be performed at all are dropped.
     for (l in store_noresidualization_XX) {
       df <- subset(df, df$d_sq_int_XX != l)
     }
